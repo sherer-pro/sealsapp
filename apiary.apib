@@ -1,0 +1,285 @@
+FORMAT: 1A
+HOST: http://private-b81596-sealsapp.apiary-mock.com/v1/
+
+# Запросы к тюленям
+
+Демо-API несуществующего мобильного приложения для отслеживания миграции тюленей на берегах Охотского моря.
+
+[Прототип API](http://private-b81596-sealsapp.apiary-mock.com/v1/) возвращает только положительные ответы, описанные ниже.
+Ответы с ошибкой описаны исключительно в документационных целях.
+
+Сервер всегда отвечает HTTP-кодом 200, даже в случае попытки неавторизованного доступа (в этом случае возвращается код ошибки из словаря ошибок).
+
+## Регистрация [/registration/]
+
+`/registration/`
+
+Регистрация пользователя по номеру телефона.
+
+### Положительный ответ [POST]
+
+Возвращается в случае, если пользователь передал корректный номер телефона.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 
+            userGuid: 
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "phone": 79667778899
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "success",
+            "userGuid": "c0deaca4-db8a-4178-8863-eaf2494833b9"
+        }
+
+### Ошибка: некорректный номер телефона [POST]
+
+Возвращается в случае, если номер телефона не соответствует формату.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 
+            userGuid: 
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "phone": 796677
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "error",
+            "dt_errorCode": [210],
+            "dt_errorMessage": "Wrong phone number"
+        }
+
+## Подтверждение [/confirm/]
+
+`/confirm/`
+
+Подтверждение номера телефона пользователя.
+
+### Положительный ответ [POST]
+
+Возвращается в случае, если код из СМС соответствует сохранённому в БД.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 
+            userGuid: c0deaca4-db8a-4178-8863-eaf2494833b9
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "code": 4509
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "success",
+            "userSecretKey": "4af0744c305991c098753117a6a19690"
+        }
+
+### Ошибка: пользователь не найден [POST]
+
+Возвращается в случае, если пользователя с указанными `userGuid` нет в БД. Универсальный ответ.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 
+            userGuid: c0deaca4-db8a-4178-8863-eaf2494833b9
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "code": 4509
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "error",
+            "dt_errorCode": [110],
+            "dt_errorMessage": "User is not found"
+        }
+
+### Ошибка: неверный код из СМС [POST]
+
+Возвращается в случае, если пеердан некорректный код из СМС.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 
+            userGuid: c0deaca4-db8a-4178-8863-eaf2494833b9
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "code": 4500
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "error",
+            "dt_errorCode": [220],
+            "dt_errorMessage": "Invalid SMS code"
+        }
+
+
+## Список точек [/getPoints/]
+
+`/getPoints/`
+
+Получения списка точек миграции тюленей.
+
+### Положительный ответ [POST]
+
+Возвращается в случае, если все параметры указаны верно и авторизация прошла успешно.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 4af0744c305991c098753117a6a19690
+            userGuid: c0deaca4-db8a-4178-8863-eaf2494833b9
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "offset": 0,
+                "scope": 60
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "success",
+            "points": [
+                {
+                    "dateTime": "2019-09-12T19:05:12-03",
+                    "coords": {
+                        "long":"59.5194488",
+                        "lat":"150.4879161"
+                    },
+                    "thumb": {
+                        "url":"/thumbs/uat12ia.jpg",
+                        "hash":"05991c09f0744a4c38756903117a6a19"
+                    },
+                    "picture": {
+                        "url":"/picture/hrdt6q7.jpg",
+                        "hash":"305991c094af0744c876a1969053117a"
+                    }
+                },
+                {
+                    "dateTime": "2019-09-13T19:075:13-12",
+                    "coords": {
+                        "long":"59.5110862",
+                        "lat":"150.7186927"
+                    },
+                    "thumb": {
+                        "url":"/thumbs/uiwy66q.jpg",
+                        "hash":"04c876a305991c1969053471194af07a"
+                    },
+                    "picture": {
+                        "url":"/picture/wad5h7a1.jpg",
+                        "hash":"9a455991a6c387690310c017a19f0744"
+                    }
+                }
+            ]
+        }
+        
+### Ошибка: не пройдена авторизация [POST]
+
+Возвращается в случае, если передан некорректный `userSecretKey`. Универсальный ответ.
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 4af0744c305991c098753117a6a19691
+            userGuid: c0deaca4-db8a-4178-8863-eaf2494833b9
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "offset": 0,
+                "scope": 60
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "error",
+            "dt_errorCode": [120],
+            "dt_errorMessage": "Authorisation Error"
+        }
+        
+### Ошибка: переданы неверные параметры [POST]
+
+Возвращается в случае, если переданы некорректные параметры запроса (например, значение `scope` не кратно значению `offset`).
+
++ Request (application/json)
+
+    + Headers
+
+            userSecretKey: 4af0744c305991c098753117a6a19691
+            userGuid: c0deaca4-db8a-4178-8863-eaf2494833b9
+            appVersion: 1.0.1
+            appDeviceId: 2fc4b5912826ad1
+            appPlatform: iOS
+
+    + Body
+
+            {
+                "offset": 50,
+                "scope": 60
+            }
+
++ Response 200 (application/json)
+
+        {
+            "dt_status": "error",
+            "dt_errorCode": [310],
+            "dt_errorMessage": "Invalid parameters passed"
+        }
